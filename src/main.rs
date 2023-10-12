@@ -1,24 +1,44 @@
-use std::sync::{Mutex, Arc};
 use warp::Filter;
 use state::State;
 
 mod handlers;
-mod services;
+mod filters;
 mod state;
 
 #[tokio::main]
 async fn main() {
-    let state = Arc::new(Mutex::new(State::new()));
+    let server_state = State::init_thread_safe();
 
-    let register_post_route = warp::path!("register")
-        .and(warp::post())
-        .and(warp::body::json())
-        .and_then({
-            let state = state.clone();
-            move |body| handlers::register_handler(body, state.clone())
-        });
+    let api = filters::clients(server_state);
 
-    let routes = register_post_route.with(warp::cors().allow_any_origin());
+    let routes = api
+        .with(warp::log("todos"))
+        .with(warp::cors().allow_any_origin());
 
     warp::serve(routes).run(([127, 0, 0, 1], 8000)).await;
+}
+
+#[cfg(test)]
+mod api_test {
+    use std::collections::HashMap;
+
+    use warp::test::request;
+    use warp::http::StatusCode;
+
+    use super::{state::State, filters};
+
+    #[tokio::test]
+    async fn post_register_client() {
+        let server_state = State::init_thread_safe();
+        let api = filters::clients(server_state);
+
+        let response = request()
+            .method("POST")
+            .path("/register")
+            .json(&HashMap::from([("user_id", 123)]))
+            .reply(&api)
+            .await;
+
+        assert_eq!(response.status(), StatusCode::OK);
+    }
 }
