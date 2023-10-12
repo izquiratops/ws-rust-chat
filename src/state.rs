@@ -33,4 +33,8 @@ impl State {
             },
         );
     }
+
+    pub async fn unregister_client(mut self, id: String) {
+        self.clients.remove(&id);
+    }
 }
