@@ -1,0 +1,97 @@
+:root {
+    --background: hsl(96 12% 30%);
+    --input-background: hsl(92 12% 24%);
+    --font-primary: hsl(0 0% 100%);
+    --font-secondary: hsl(96 7% 52%);
+    --active-accent: hsl(52 49% 53%);
+    --shadow-clear: hsl(93 4% 41%);
+    --shadow-dark: hsl(93 14% 21%);
+    
+    --space-xxs: 0.25rem;
+    --space-xs: 0.5rem;
+    --space-sm: 1rem;
+    --space-md: 1.5rem;
+    --space-lg: 2rem;
+    --space-xl: 3rem;
+    --space-xxl: 6rem;
+}
+
+.green-light-box {
+    background: var(--background);
+    color: var(--font-primary);
+    border: 1px solid;
+    border-color: var(--shadow-clear) var(--shadow-dark) var(--shadow-dark) var(--shadow-clear);
+}
+
+.green-light-box:active {
+    background: var(--input-background);
+    color: var(--font-secondary);
+    border-color: var(--shadow-dark) var(--shadow-clear) var(--shadow-clear) var(--shadow-dark);
+}
+
+.green-dark-box {
+    background-color: var(--input-background);
+    color: var(--font-primary);
+    border: 1px solid;
+    border-color: var(--shadow-clear) var(--shadow-dark) var(--shadow-dark) var(--shadow-clear);
+}
+
+.green-dark-box:checked {
+    color: var(--active-accent);
+    border-color: var(--shadow-clear) var(--shadow-dark) var(--shadow-dark) var(--shadow-clear);
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+}
+
+html {
+  block-size: 100%;
+  inline-size: 100%;
+}
+
+body {
+    min-block-size: 100%;
+    min-inline-size: 100%;
+  
+    box-sizing: border-box;
+    padding-block: var(--space-xs);
+    margin: 0;
+  
+    background: var(--background);
+    color: var(--font-primary);
+  
+    font-family: system-ui, sans-serif;
+}
+
+main {
+    display: grid;
+    place-content: center;
+}
+
+section {
+    display: grid;
+    gap: var(--space-md);
+}
+
+button {  
+    border-radius: 0;
+    padding: var(--space-xs);
+    cursor: pointer;
+  
+    text-align: start;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+button:focus {
+    text-decoration: underline;
+    text-decoration-style: dotted;
+}
+
+input {  
+    padding: var(--space-xs);
+}
