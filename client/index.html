@@ -4,26 +4,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gordon Friends</title>
+    <title>λ</title>
     <link rel="stylesheet" href="styles.css" />
 </head>
 
 <body>
     <main>
+        <h3>crowbar.chat</h3>
+
         <section class="green-dark-box">
-            <ul id="messages">
-                <li>Hi there!</li>
-            </ul>
+            <div id="chat"></div>
         </section>
+
         <form name="chat-input" method="dialog">
-            <div class="username-form-box">
-                <input type="username" name="username" id="username" class="green-dark-box"
+            <input type="username" name="username" id="username" class="green-dark-box"
                     placeholder="Put a goofy name here" required />
-            </div>
-            <div class="message-form-box">
-                <input type="message" name="message" id="message" class="green-dark-box"
+            <input type="text" name="message" id="input-message" class="green-dark-box"
                     placeholder="How is going on?" />
-            </div>
             <button type="submit" class="green-light-box">Submit</button>
         </form>
     </main>

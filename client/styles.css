@@ -6,9 +6,9 @@
     --active-accent: hsl(52 49% 53%);
     --shadow-clear: hsl(93 4% 41%);
     --shadow-dark: hsl(93 14% 21%);
-    
-    --space-xxs: 0.25rem;
-    --space-xs: 0.5rem;
+
+    --space-xxs: 0.15rem;
+    --space-xs: 0.25rem;
     --space-sm: 1rem;
     --space-md: 1.5rem;
     --space-lg: 2rem;
@@ -19,7 +19,7 @@
 .green-light-box {
     background: var(--background);
     color: var(--font-primary);
-    border: 1px solid;
+    border: 2px solid;
     border-color: var(--shadow-clear) var(--shadow-dark) var(--shadow-dark) var(--shadow-clear);
 }
 
@@ -32,7 +32,7 @@
 .green-dark-box {
     background-color: var(--input-background);
     color: var(--font-primary);
-    border: 1px solid;
+    border: 2px solid;
     border-color: var(--shadow-clear) var(--shadow-dark) var(--shadow-dark) var(--shadow-clear);
 }
 
@@ -44,44 +44,40 @@
 h1,
 h2,
 h3 {
-  margin: 0;
+    margin: 0;
 }
 
-html {
-  block-size: 100%;
-  inline-size: 100%;
+html, body {
+    block-size: 100%;
+    inline-size: 100%;
+    background: var(--background);
+    color: var(--font-primary);
 }
 
 body {
-    min-block-size: 100%;
-    min-inline-size: 100%;
-  
+    display: grid;
+    grid-template-rows: 100%;
     box-sizing: border-box;
-    padding-block: var(--space-xs);
     margin: 0;
-  
-    background: var(--background);
-    color: var(--font-primary);
-  
-    font-family: system-ui, sans-serif;
+
+    /* cursor: url('path-to-image.png'), auto; */
+    font-family: Consolas, system-ui, sans-serif;
+    font-weight: 400;
 }
 
 main {
-    display: grid;
-    place-content: center;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding: var(--space-sm);
 }
 
-section {
-    display: grid;
-    gap: var(--space-md);
-}
-
-button {  
+button {
     border-radius: 0;
     padding: var(--space-xs);
     cursor: pointer;
-  
-    text-align: start;
+
+    text-align: center;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
@@ -92,6 +88,36 @@ button:focus {
     text-decoration-style: dotted;
 }
 
-input {  
+section {
+    flex: 1 0 auto;
+    gap: var(--space-md);
+    position: relative;
+}
+
+#chat {
+    position: absolute;
+    display: flex;
+    flex-direction: column-reverse;
+    height: 100%;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    overflow-y: scroll;
+}
+
+#message {
+    list-style: none;
+    padding-inline-start: var(--space-sm);
+    padding-block: var(--space-xxs);
+}
+
+form {
+    flex: 0 0 auto;
+    display: grid;
+    gap: var(--space-xs);
+    margin-block-start: var(--space-sm);
+}
+
+input {
     padding: var(--space-xs);
 }
