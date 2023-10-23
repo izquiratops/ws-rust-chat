@@ -7,11 +7,10 @@
     --shadow-clear: hsl(93 4% 41%);
     --shadow-dark: hsl(93 14% 21%);
 
-    --space-xxs: 0.15rem;
     --space-xs: 0.25rem;
-    --space-sm: 1rem;
-    --space-md: 1.5rem;
-    --space-lg: 2rem;
+    --space-sm: 0.75rem;
+    --space-md: 1rem;
+    --space-lg: 1.5rem;
     --space-xl: 3rem;
     --space-xxl: 6rem;
 }
@@ -68,8 +67,8 @@ body {
 main {
     display: flex;
     flex-direction: column;
-    gap: var(--space-xs);
-    padding: var(--space-sm);
+    gap: var(--space-sm);
+    padding: var(--space-md);
 }
 
 button {
@@ -94,30 +93,47 @@ section {
     position: relative;
 }
 
-#chat {
+form {
+    flex: 0 0 auto;
+    display: grid;
+    gap: var(--space-xs);
+}
+
+input {
+    padding: var(--space-xs);
+}
+
+#chat-container {
     position: absolute;
     display: flex;
     flex-direction: column-reverse;
-    height: 100%;
-    width: 100%;
+    block-size: 100%;
+    inline-size: 100%;
     padding: 0;
     margin: 0;
     overflow-y: scroll;
 }
 
-#message {
+#chat-entry {
     list-style: none;
-    padding-inline-start: var(--space-sm);
-    padding-block: var(--space-xxs);
+    padding-inline-start: var(--space-md);
+    padding-block: var(--space-xs);
 }
 
-form {
-    flex: 0 0 auto;
-    display: grid;
-    gap: var(--space-xs);
-    margin-block-start: var(--space-sm);
+#chat-entry::before {
+    content: '>';
+    margin-inline-end: var(--space-xs);
 }
 
-input {
-    padding: var(--space-xs);
+#chat-entry:first-of-type {
+    padding-block-end: var(--space-sm);
+}
+
+#chat-entry > span:first-of-type {
+    font-weight: bold;
+    margin-inline-end: var(--space-xs);
+}
+
+#chat-entry > span:first-of-type::after {
+    content: ':';
 }
