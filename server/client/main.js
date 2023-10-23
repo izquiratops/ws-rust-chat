@@ -1,5 +1,5 @@
 const MAX_HISTORY_SIZE = 60;
-const socket = new WebSocket("wss://javascript.info/article/websocket/chat/ws", ["soap", "wamp"]);
+const socket = new WebSocket("ws://localhost:3030/chat");
 
 socket.onopen = (_) => {
     console.debug("Connection established");    
