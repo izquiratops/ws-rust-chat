@@ -51,6 +51,7 @@ html, body {
     inline-size: 100%;
     background: var(--background);
     color: var(--font-primary);
+    cursor: url('banana.png');
 }
 
 body {
@@ -106,7 +107,7 @@ input {
 #chat-container {
     position: absolute;
     display: flex;
-    flex-direction: column-reverse;
+    flex-direction: column;
     block-size: 100%;
     inline-size: 100%;
     padding: 0;
