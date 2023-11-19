@@ -9,6 +9,7 @@ function handleWebsocketsMessage(event) {
 
     // Append new message
     const chatContainerEl = document.getElementById('chat-container');
+    console.debug('!!');
     const chatEntryContainerEl = document.createElement('div');
     chatEntryContainerEl.id = 'chat-entry';
 

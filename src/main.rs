@@ -16,17 +16,17 @@ async fn main() {
     let users = Users::default();
     let with_users = warp::any().map(move || users.clone());
 
-    let chat_history = MessageHistory::default();
-    let with_chat_history = warp::any().map(move || chat_history.clone());
+    let msg_history = MessageHistory::default();
+    let with_msg_history = warp::any().map(move || msg_history.clone());
 
     let index = warp::fs::dir("client");
 
     let chat = warp::path("chat")
         .and(warp::ws())
         .and(with_users)
-        .and(with_chat_history)
-        .map(|ws: warp::ws::Ws, users, chat_history| {
-            ws.on_upgrade(move |socket| user_connected(socket, users, chat_history))
+        .and(with_msg_history)
+        .map(|ws: warp::ws::Ws, users, msg_history| {
+            ws.on_upgrade(move |socket| user_connected(socket, users, msg_history))
         });
 
     warp::serve(index.or(chat))
@@ -34,14 +34,14 @@ async fn main() {
         .await;
 }
 
-async fn user_connected(ws: WebSocket, users: Users, chat_history: MessageHistory) {
+async fn user_connected(ws: WebSocket, users: Users, msg_history: MessageHistory) {
     let uuid = Uuid::new_v4().simple().to_string();
 
     let (user_ws_tx, mut user_ws_rx) = ws.split();
     let (user_channel_tx, user_channel_rx) = mpsc::unbounded_channel();
 
     // Send the user the chat history when a user is connected.
-    send_chat_history(&chat_history, &user_channel_tx).await;
+    send_msg_history(&msg_history, &user_channel_tx).await;
 
     // Use an unbounded channel to set up a message queue for the user.
     tokio::task::spawn(forward_messages(user_channel_rx, user_ws_tx));
@@ -55,9 +55,9 @@ async fn user_connected(ws: WebSocket, users: Users, chat_history: MessageHistor
     // If an error occurs during the WebSocket communication, it prints an error message and breaks out of the loop.
     while let Some(result) = user_ws_rx.next().await {
         match result {
-            Ok(msg) => user_message(msg, &users, &chat_history).await,
+            Ok(msg) => user_message(msg, &users, &msg_history).await,
             Err(e) => {
-                eprintln!("websocket error(uid={}): {}", &uuid, e);
+                eprintln!("WebSocket error (uid={}): {}", &uuid, e);
                 break;
             }
         }
@@ -66,16 +66,16 @@ async fn user_connected(ws: WebSocket, users: Users, chat_history: MessageHistor
     user_disconnected(uuid, users).await;
 }
 
-async fn send_chat_history(chat_history: &MessageHistory, tx: &mpsc::UnboundedSender<Message>) {
-    for chat_history_message in chat_history.read().await.iter() {
-        if let Err(_disconnected) = tx.send(Message::text(chat_history_message)) {
+async fn send_msg_history(msg_history: &MessageHistory, user_channel_tx: &mpsc::UnboundedSender<Message>) {
+    for message in msg_history.read().await.iter() {
+        if let Err(_disconnected) = user_channel_tx.send(Message::text(message)) {
             eprintln!("Error sending a history message: {}", _disconnected);
         }
     }
 }
 
-async fn forward_messages(rx: mpsc::UnboundedReceiver<Message>, mut user_ws_tx: SplitSink<WebSocket, Message>) {
-    let mut rx = UnboundedReceiverStream::new(rx);
+async fn forward_messages(user_channel_rx: mpsc::UnboundedReceiver<Message>, mut user_ws_tx: SplitSink<WebSocket, Message>) {
+    let mut rx = UnboundedReceiverStream::new(user_channel_rx);
     while let Some(message) = rx.next().await {
         if let Err(_disconnected) = user_ws_tx.send(message).await {
             eprintln!("Error forwarding a message: {}", _disconnected);
@@ -83,28 +83,33 @@ async fn forward_messages(rx: mpsc::UnboundedReceiver<Message>, mut user_ws_tx: 
     }
 }
 
-async fn user_message(msg: Message, users: &Users, chat_history: &MessageHistory) {
+async fn user_message(msg: Message, users: &Users, msg_history: &MessageHistory) {
     if let Ok(msg_str) = msg.to_str() {
         let msg_text = msg_str.to_string();
 
         broadcast_message(&users, &msg_text).await;
 
-        save_message_to_history(&chat_history, msg_text).await;
+        save_message_to_history(&msg_history, msg_text).await;
     }
 }
 
-async fn save_message_to_history(chat_history: &MessageHistory, msg_text: String) {
-    let mut chat_write = chat_history.write().await;
-    chat_write.push_back(msg_text);
+async fn save_message_to_history(msg_history: &MessageHistory, msg_text: String) {
+    let mut msg_write = msg_history.write().await;
+    msg_write.push_back(msg_text);
 
-    if chat_write.len() > 60 {
-        chat_write.pop_front();
+    let max_msg_history_length = std::env::var("MAX_MSG_HISTORY_LENGTH")
+        .expect("MAX_MSG_HISTORY_LENGTH must be set")
+        .parse::<usize>()
+        .unwrap();
+
+    if msg_write.len() > max_msg_history_length {
+        msg_write.pop_front();
     }
 }
 
 async fn broadcast_message(users: &Users, msg_text: &str) {
-    for (_, tx) in users.read().await.iter() {
-        if let Err(_disconnected) = tx.send(Message::text(msg_text)) {
+    for (_, user_channel_tx) in users.read().await.iter() {
+        if let Err(_disconnected) = user_channel_tx.send(Message::text(msg_text)) {
             // The tx is disconnected, our `user_disconnected` code
             // should be happening in another task, nothing more to
             // do here.
@@ -113,6 +118,6 @@ async fn broadcast_message(users: &Users, msg_text: &str) {
     }
 }
 
-async fn user_disconnected(my_id: String, users: Users) {
-    users.write().await.remove(&my_id);
+async fn user_disconnected(user_id: String, users: Users) {
+    users.write().await.remove(&user_id);
 }
