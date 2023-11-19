@@ -1,11 +1,14 @@
 const MAX_HISTORY_SIZE = 60;
 const socket = new WebSocket("ws://localhost:3030/chat");
 
-socket.onmessage = (event) => {
+socket.onmessage = handleWebsocketsMessage;
+document.querySelector('form').onsubmit = handleSubmitForm;
+
+function handleWebsocketsMessage(event) {
     const newMessage = JSON.parse(event.data);
 
     // Append new message
-    const chatContainerEl = document.getElementById('chat');
+    const chatContainerEl = document.getElementById('chat-container');
     const chatEntryContainerEl = document.createElement('div');
     chatEntryContainerEl.id = 'chat-entry';
 
@@ -25,9 +28,9 @@ socket.onmessage = (event) => {
         const messageToBeRemoved = historyMessages[historyMessages.length - 1];
         chatContainerEl.removeChild(messageToBeRemoved);
     }
-};
+}
 
-document.querySelector('form').onsubmit = (event) => {
+function handleSubmitForm(event) {
     const formData = new FormData(event.target);
     const formProps = Object.fromEntries(formData);
     const message = JSON.stringify(formProps, null, 4);
