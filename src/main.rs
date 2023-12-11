@@ -98,9 +98,9 @@ async fn save_message_to_history(msg_history: &MessageHistory, msg_text: String)
     msg_write.push_back(msg_text);
 
     let max_msg_history_length = std::env::var("MAX_MSG_HISTORY_LENGTH")
-        .expect("MAX_MSG_HISTORY_LENGTH must be set")
-        .parse::<usize>()
-        .unwrap();
+        .ok()
+        .and_then(|x| x.parse::<usize>().ok())
+        .unwrap_or(100);
 
     if msg_write.len() > max_msg_history_length {
         msg_write.pop_front();

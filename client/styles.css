@@ -107,7 +107,7 @@ input {
 #chat-container {
     position: absolute;
     display: flex;
-    flex-direction: column;
+    flex-direction: column-reverse;
     block-size: 100%;
     inline-size: 100%;
     padding: 0;
