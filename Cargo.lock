@@ -422,7 +422,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "movidas"
+name = "crowbar.chat"
 version = "0.1.0"
 dependencies = [
  "futures",
